@@ -7,7 +7,7 @@ export default function Home() {
   const [msg, setMsg] = useState("--");
 
   useEffect(() => {
-    const url = "https://192.168.0.2/api/jsonrpc";
+    const url = "https://192.168.1.3/api/jsonrpc";
     const headers = { "Content-Type": "application/json" };
 
     const fetchData = async () => {
