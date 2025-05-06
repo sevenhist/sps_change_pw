@@ -32,7 +32,7 @@ export default function Home() {
           jsonrpc: "2.0",
           method: "PlcProgram.Read",
           params: {
-            var: '"somedata".counter',
+            var: "\"somedata_DB\".counter",
           },
           id: 2,
         };
