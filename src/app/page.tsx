@@ -32,7 +32,7 @@ export default function Home() {
           jsonrpc: "2.0",
           method: "PlcProgram.Read",
           params: {
-            var: "\"somedata_DB\".counter",
+            var: "\"test\".alex",
           },
           id: counter++,
         };
@@ -58,7 +58,7 @@ export default function Home() {
   return (
     <div>
       <h2>Hello</h2>
-      <p id="value">--</p>
+      <p id="value">Alex ist {msg} Jahre Alt</p>
       <p id="counter">--</p>
     </div>
   );
