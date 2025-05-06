@@ -1,65 +1,93 @@
 "use client"; // Nur wenn du im App Router bist
 
-import { useEffect, useState } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 
+interface ChangePasswordResponse {
+  // Typen anpassen je nach API-Antwortstruktur
+  success: boolean;
+  message: string;
+}
+
 export default function Home() {
-  const [msg, setMsg] = useState("--");
-  let counter=1;
-  useEffect(() => {
-    const url = "https://192.168.1.3/api/jsonrpc";
-    const headers = { "Content-Type": "application/json" };
+  const [ip, setIp] = useState<string>('https://192.168.1.3');
+  const [port, setPort] = useState<string>('443');
+  const [username, setUsername] = useState<string>('');
+  const [currentPassword, setCurrentPassword] = useState<string>('');
+  const [newPassword, setNewPassword] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
 
-    const fetchData = async () => {
-      try {
-        // Login
-        const loginPayload = {
-          jsonrpc: "2.0",
-          id: 1,
-          method: "Api.Login",
-          params: {
-            user: "json",
-            password: "json",
-          },
-        };
+  // Typisierte Funktion für das Ändern des Passworts
+  const handleChangePassword = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
 
-        const loginRes = await axios.post(url, loginPayload, { headers });
-        const token = loginRes.data.result.token;
-        console.log("Token:", token);
+    const url = `https://${ip}:${port}/api/ChangePassword`;
 
-        // Read Request
-        const readPayload = {
-          jsonrpc: "2.0",
-          method: "PlcProgram.Read",
-          params: {
-            var: "\"test\".alex",
-          },
-          id: counter++,
-        };
+    try {
+      const response = await axios.post<ChangePasswordResponse>(
+        url,
+        {
+          username: username,
+          password: currentPassword,
+          new_password: newPassword,
+        },
+        {
+          // Achtung: httpsAgent funktioniert nicht im Browser, das musst du serverseitig verwenden!
+          // httpsAgent: new window.https.Agent({ rejectUnauthorized: false }),
+        }
+      );
 
-        const readRes = await axios.post(url, readPayload, {
-          headers: {
-            "Content-Type": "application/json",
-            "X-Auth-Token": token,
-          },
-        });
-
-        console.log("Read response:", readRes.data);
-        setMsg(JSON.stringify(readRes.data.result));
-      } catch (err) {
-        console.error("Fehler beim Abrufen:", err);
-        setMsg("Fehler beim Abrufen");
+      if (response.data.success) {
+        setMessage('✅ Passwort erfolgreich geändert');
+      } else {
+        setMessage('⚠️ Unerwartete Antwort: ' + JSON.stringify(response.data));
       }
-    };
-
-    fetchData();
-  }, []);
+    } catch (error: any) {
+      if (error.response) {
+        setMessage(`❌ Fehler: ${JSON.stringify(error.response.data)}`);
+      } else {
+        setMessage(`❌ Netzwerkfehler: ${error.message}`);
+      }
+    }
+  };
 
   return (
-    <div>
-      <h2>Hello</h2>
-      <p id="value">Alex ist {msg} Jahre Alt</p>
-      <p id="counter">--</p>
-    </div>
+    <form onSubmit={handleChangePassword} style={{ maxWidth: 400 }}>
+      <h2>Passwort ändern</h2>
+      <input
+        placeholder="SPS-IP-Adresse"
+        value={ip}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setIp(e.target.value)}
+        required
+      />
+      <input
+        placeholder="Port"
+        value={port}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setPort(e.target.value)}
+        required
+      />
+      <input
+        placeholder="Benutzername"
+        value={username}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+        required
+      />
+      <input
+        type="password"
+        placeholder="Aktuelles Passwort"
+        value={currentPassword}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setCurrentPassword(e.target.value)}
+        required
+      />
+      <input
+        type="password"
+        placeholder="Neues Passwort"
+        value={newPassword}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
+        required
+      />
+      <button type="submit">Ändern</button>
+      <div>{message}</div>
+    </form>
   );
 }
