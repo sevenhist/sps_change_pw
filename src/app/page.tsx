@@ -18,7 +18,7 @@ interface ChangePasswordResponse {
 export default function Home() {
   // State für Login-Daten und Passwortänderung
   const [msg, setMsg] = useState<string>("--");
-  const [ip, setIp] = useState<string>("https://192.168.1.3");
+  const [ip, setIp] = useState<string>("192.168.1.3");
   const [port, setPort] = useState<string>("443");
   const [username, setUsername] = useState<string>("");
   const [currentPassword, setCurrentPassword] = useState<string>("");
