@@ -70,7 +70,7 @@ export default function Home() {
       else newOilTemp -= 1.5; // auch langsamer wird weniger werden als bei normalle temperatur
       newOilTemp = Math.max(0, Math.min(newOilTemp, 120)); // grenzen defenierung
 
-      const newFault = newTemp < 100 || newOilTemp > 100; // wenn die Temperatur mehr als 100 dann bekommen wir Fehlermeldung
+      const newFault = newTemp > 100 || newOilTemp > 100; // wenn die Temperatur mehr als 100 dann bekommen wir Fehlermeldung
 
       // für graphics Speicherung
       const now = Date.now();
